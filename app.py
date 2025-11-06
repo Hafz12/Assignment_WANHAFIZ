@@ -77,28 +77,44 @@ def genetic_algorithm(initial_schedule, ratings, generations, population_size, c
 # ----------------------------------------
 # Streamlit Interface
 # ----------------------------------------
-st.title("📅 Genetic Algorithm Scheduler – Multiple Trials")
+st.title("📅 Genetic Algorithm Scheduler (JIE42903 Assignment)")
 st.markdown("""
-This app allows you to run **three separate trials** of a Genetic Algorithm for scheduling.  
-Each trial can have its own **Crossover Rate (CO_R)** and **Mutation Rate (MUT_R)**.
+### Developed by: Wan Muhammad Hafiz Bin Wan Ibrahim  
+This app demonstrates a **Genetic Algorithm** used to optimize a scheduling problem.  
+You can adjust the parameters below, view the dataset, and compare results from three trials.
 """)
 
-# Load data
+# ----------------------------------------
+# Dataset Display
+# ----------------------------------------
+st.subheader("📊 Program Ratings Dataset")
 file_path = "program_ratings_modified.csv"
+
+try:
+    dataset_df = pd.read_csv(file_path)
+    st.dataframe(dataset_df, use_container_width=True)
+except FileNotFoundError:
+    st.error("❌ The file 'program_ratings_modified.csv' was not found. Please make sure it's in the same folder as this app.")
+    st.stop()
+
 ratings = read_csv_to_dict(file_path)
 all_programs = list(ratings.keys())
 all_time_slots = list(range(6, 6 + len(all_programs)))  # time slots: 6 AM onwards
 
-# Sidebar controls
-st.sidebar.header("Global GA Settings")
+# ----------------------------------------
+# Sidebar Controls
+# ----------------------------------------
+st.sidebar.header("⚙️ Genetic Algorithm Settings")
 GEN = st.sidebar.slider("Generations", 10, 500, 100, 10)
 POP = st.sidebar.slider("Population Size", 10, 100, 50, 5)
 EL_S = st.sidebar.slider("Elitism Size", 1, 5, 2, 1)
 
-# Trial Parameter Inputs
-st.subheader("⚙️ Set Parameters for Each Trial")
-cols = st.columns(3)
+# ----------------------------------------
+# Parameter Inputs for 3 Trials
+# ----------------------------------------
+st.subheader("🧩 Set Parameters for Each Trial")
 
+cols = st.columns(3)
 trial_params = []
 for i, col in enumerate(cols, start=1):
     with col:
@@ -107,7 +123,9 @@ for i, col in enumerate(cols, start=1):
         MUT_R = st.slider(f"Trial {i} - Mutation Rate", 0.01, 0.05, 0.02, 0.01, key=f"mut{i}")
         trial_params.append((CO_R, MUT_R))
 
-# Run all trials when user clicks button
+# ----------------------------------------
+# Run All Trials Button
+# ----------------------------------------
 if st.button("🚀 Run All Trials"):
     results = []
     for i, (CO_R, MUT_R) in enumerate(trial_params, start=1):
@@ -134,9 +152,9 @@ if st.button("🚀 Run All Trials"):
             "Schedule": best_schedule
         })
 
-    # Display results for all trials
+    # Display results for each trial
     for res in results:
-        st.subheader(f"🧩 {res['Trial']} Results")
+        st.markdown(f"### 🧠 {res['Trial']} Results")
         st.write(f"**Crossover Rate:** {res['Crossover Rate']} | **Mutation Rate:** {res['Mutation Rate']}")
         df = pd.DataFrame({
             "Time Slot": [f"{t}:00" for t in all_time_slots],
@@ -145,3 +163,17 @@ if st.button("🚀 Run All Trials"):
         st.table(df)
         st.write(f"**Total Fitness (Rating):** {res['Total Rating']}")
         st.markdown("---")
+
+    # Summary Table
+    st.subheader("📈 Trial Summary")
+    summary_df = pd.DataFrame([
+        {
+            "Trial": res["Trial"],
+            "Crossover Rate": res["Crossover Rate"],
+            "Mutation Rate": res["Mutation Rate"],
+            "Total Rating": res["Total Rating"]
+        }
+        for res in results
+    ])
+    st.dataframe(summary_df, use_container_width=True)
+    st.success("✅ All trials completed successfully!")
