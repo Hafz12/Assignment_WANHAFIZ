@@ -1,0 +1,6 @@
+Program	  Column (Hour)	Old data	Modified data
+News	      10	          0.5        	0.3
+Movie a	    12	          0.1        	0.3
+Movie a     17            0.4	        0.2
+Movie b	    23	          0.5        	0.6
+Tv series 	8	            0.3        	0.0
