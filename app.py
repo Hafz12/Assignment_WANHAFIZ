@@ -3,9 +3,7 @@ import pandas as pd
 import csv
 import random
 
-# ----------------------------------------
 # Function to read the CSV file
-# ----------------------------------------
 def read_csv_to_dict(file_path):
     program_ratings = {}
     with open(file_path, mode='r', newline='') as file:
@@ -17,18 +15,14 @@ def read_csv_to_dict(file_path):
             program_ratings[program] = ratings
     return program_ratings
 
-# ----------------------------------------
 # Fitness Function
-# ----------------------------------------
 def fitness_function(schedule, ratings):
     total_rating = 0
     for time_slot, program in enumerate(schedule):
         total_rating += ratings[program][time_slot]
     return total_rating
 
-# ----------------------------------------
 # Genetic Algorithm Functions
-# ----------------------------------------
 def crossover(schedule1, schedule2):
     crossover_point = random.randint(1, len(schedule1) - 2)
     child1 = schedule1[:crossover_point] + schedule2[crossover_point:]
@@ -74,19 +68,13 @@ def genetic_algorithm(initial_schedule, ratings, generations, population_size, c
     best_schedule = max(population, key=lambda schedule: fitness_function(schedule, ratings))
     return best_schedule
 
-# ----------------------------------------
 # Streamlit Interface
-# ----------------------------------------
-st.title("📅 Genetic Algorithm Scheduler (JIE42903 Assignment)")
+st.title(" Genetic Algorithm for TV Program Schedular(JIE42903 Assignment)")
 st.markdown("""
 ### Developed by: Wan Muhammad Hafiz Bin Wan Ibrahim  
-This app demonstrates a **Genetic Algorithm** used to optimize a scheduling problem.  
-You can adjust the parameters below, view the dataset, and compare results from three trials.
 """)
 
-# ----------------------------------------
 # Dataset Display
-# ----------------------------------------
 st.subheader("📊 Program Ratings Dataset")
 file_path = "program_ratings_modified.csv"
 
@@ -94,25 +82,22 @@ try:
     dataset_df = pd.read_csv(file_path)
     st.dataframe(dataset_df, use_container_width=True)
 except FileNotFoundError:
-    st.error("❌ The file 'program_ratings_modified.csv' was not found. Please make sure it's in the same folder as this app.")
+    st.error(" The file 'program_ratings_modified.csv' was not found. Please make sure it's in the same folder as this app.")
     st.stop()
 
 ratings = read_csv_to_dict(file_path)
 all_programs = list(ratings.keys())
 all_time_slots = list(range(6, 6 + len(all_programs)))  # time slots: 6 AM onwards
 
-# ----------------------------------------
 # Sidebar Controls
-# ----------------------------------------
+
 st.sidebar.header("⚙️ Genetic Algorithm Settings")
 GEN = st.sidebar.slider("Generations", 10, 500, 100, 10)
 POP = st.sidebar.slider("Population Size", 10, 100, 50, 5)
 EL_S = st.sidebar.slider("Elitism Size", 1, 5, 2, 1)
 
-# ----------------------------------------
 # Parameter Inputs for 3 Trials
-# ----------------------------------------
-st.subheader("🧩 Set Parameters for Each Trial")
+st.subheader(" Set Parameters for Each Trial")
 
 cols = st.columns(3)
 trial_params = []
@@ -123,9 +108,7 @@ for i, col in enumerate(cols, start=1):
         MUT_R = st.slider(f"Trial {i} - Mutation Rate", 0.01, 0.05, 0.02, 0.01, key=f"mut{i}")
         trial_params.append((CO_R, MUT_R))
 
-# ----------------------------------------
 # Run All Trials Button
-# ----------------------------------------
 if st.button("🚀 Run All Trials"):
     results = []
     for i, (CO_R, MUT_R) in enumerate(trial_params, start=1):
@@ -154,7 +137,7 @@ if st.button("🚀 Run All Trials"):
 
     # Display results for each trial
     for res in results:
-        st.markdown(f"### 🧠 {res['Trial']} Results")
+        st.markdown(f"### 📈 {res['Trial']} Results")
         st.write(f"**Crossover Rate:** {res['Crossover Rate']} | **Mutation Rate:** {res['Mutation Rate']}")
         df = pd.DataFrame({
             "Time Slot": [f"{t}:00" for t in all_time_slots],
@@ -165,7 +148,7 @@ if st.button("🚀 Run All Trials"):
         st.markdown("---")
 
     # Summary Table
-    st.subheader("📈 Trial Summary")
+    st.subheader(" Trial Summary")
     summary_df = pd.DataFrame([
         {
             "Trial": res["Trial"],
